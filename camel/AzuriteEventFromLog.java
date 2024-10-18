@@ -9,6 +9,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class AzuriteEventFromLog extends RouteBuilder {
 
@@ -50,6 +52,25 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .to("direct:processLine");
 
         from("direct:processLine")
+                .process(new Processor() {
+
+                    @Override
+                    public void process(Exchange exchange) throws Exception {
+                        String regex = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
+                        String line = exchange.getMessage().getBody().toString();
+                        System.out.println("Apache log input line: " + line);
+                        Pattern p = Pattern.compile(regex);
+                        Matcher matcher = p.matcher(line);
+                        if (matcher.find()) {
+                            System.out.println("Date/Time: " + matcher.group(1));
+                            System.out.println("method: " + matcher.group(2));
+                            System.out.println("Request: " + matcher.group(3).split("\\?")[0]);
+                            System.out.println("status: " + matcher.group(4));
+                        }
+
+                    }
+
+                })
                 .log("<<<<${header.CamelStreamIndex}|${variable.old_position}|${variable.skip_line}>>>> ${body}");
     }
 }
