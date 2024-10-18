@@ -1,0 +1,31 @@
+{
+  "java.project.referencedLibraries": [
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/jakarta.activation-api-2.1.3.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-core-reifier-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/jakarta.xml.bind-api-4.0.2.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-management-api-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-debug-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-health-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-xml-io-util-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-core-processor-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-management-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-core-languages-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/slf4j-api-2.0.16.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-xml-jaxp-util-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-support-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-api-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-core-engine-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-base-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-log-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-core-model-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-main-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-xml-io-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-timer-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-util-json-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-bean-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-base-engine-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-util-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/*.jar"
+  ],
+  "java.project.sourcePaths": ["."]
+}

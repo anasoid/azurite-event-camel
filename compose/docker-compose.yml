@@ -1,0 +1,15 @@
+version: "3"
+
+services:
+  log-generator:
+    extends:
+      file: ./docker-compose.log-generator.yml
+      service: log-generator
+
+  azurite:
+    extends:
+      file: ./docker-compose.azurite.yml
+      service: azurite
+
+volumes:
+  logs:

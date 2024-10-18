@@ -1,0 +1,21 @@
+---
+version: "3.9"
+services:
+  azurite:
+    image: mcr.microsoft.com/azure-storage/azurite
+    container_name: "azurite"
+    hostname: azurite
+    command:
+      [
+        "/bin/sh",
+        "-c",
+        "azurite -l /data --blobHost 0.0.0.0  --queueHost 0.0.0.0 --tableHost  0.0.0.0 | tee /logs/access-azurite.log",
+      ]
+    ports:
+      - "0.0.0.0:${AZURITE_PORT:-10000}:10000"
+
+    volumes:
+      - ./.logs:/logs
+
+volumes:
+  logs:
