@@ -56,16 +56,19 @@ public class AzuriteEventFromLog extends RouteBuilder {
 
                     @Override
                     public void process(Exchange exchange) throws Exception {
-                        String regex = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
+                        String regex = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/(\\S+)/(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
                         String line = exchange.getMessage().getBody().toString();
                         System.out.println("Apache log input line: " + line);
                         Pattern p = Pattern.compile(regex);
                         Matcher matcher = p.matcher(line);
                         if (matcher.find()) {
-                            System.out.println("Date/Time: " + matcher.group(1));
-                            System.out.println("method: " + matcher.group(2));
-                            System.out.println("Request: " + matcher.group(3).split("\\?")[0]);
-                            System.out.println("status: " + matcher.group(4));
+                            System.out.println(">> Date/Time: " + matcher.group(1));
+                            System.out.println(">> method: " + matcher.group(2));
+                            System.out.println(">> account: " + matcher.group(3));
+                            System.out.println(">> container: " + matcher.group(4));
+                            System.out.println(">> file: " + matcher.group(5).split("\\?")[0]);
+                            System.out.println(">> url: " + matcher.group(6));
+                            System.out.println(">> status: " + matcher.group(6));
                         }
 
                     }
