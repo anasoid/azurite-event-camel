@@ -1,4 +1,4 @@
-package org.anasoid.azuriteevent;
+package org.anasoid.azurite.event;
 
 import org.apache.camel.Exchange;
 import org.apache.camel.Processor;

@@ -1,4 +1,4 @@
-package org.anasoid.azuriteevent;
+package org.anasoid.azurite.event;
 
 
 import org.junit.jupiter.api.Assertions;
@@ -6,9 +6,6 @@ import org.junit.jupiter.api.Test;
 
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
-import java.time.temporal.TemporalAccessor;
-import java.util.Date;
 
 /*
  * Copyright 2023-2024 the original author or authors.

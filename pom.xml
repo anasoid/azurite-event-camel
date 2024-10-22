@@ -94,7 +94,7 @@
                 <version>4.8.0</version>
                 <configuration>
                     <logClasspath>true</logClasspath>
-                    <mainClass>org.anasoid.azuriteevent.MyApplication</mainClass>
+                    <mainClass>org.anasoid.azurite.event.MyApplication</mainClass>
                 </configuration>
             </plugin>
             <plugin>

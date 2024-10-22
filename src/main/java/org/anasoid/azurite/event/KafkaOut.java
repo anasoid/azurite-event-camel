@@ -1,4 +1,4 @@
-package org.anasoid.azuriteevent;
+package org.anasoid.azurite.event;
 
 import org.anasoid.azuriteevent.AzuriteEventFromLog.EventData;
 import org.apache.camel.Exchange;
