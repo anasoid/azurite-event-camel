@@ -1,2 +1,4 @@
 compose/.logs
 .camel-jbang
+target
+.idea
