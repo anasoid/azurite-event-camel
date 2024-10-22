@@ -17,69 +17,48 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import static org.apache.camel.LoggingLevel.DEBUG;
+
 public class AzuriteEventFromLog extends RouteBuilder {
 
     private final static String CONF_AZURITE_URL = "AZURITE_URL";
     private final static String CONF_AZURITE_LOG_FOLDER = "AZURITE_URL";
     private final static String FILE_NAME = "access-azurite";
-    private final static String FILE_PATH =System.getProperty(CONF_AZURITE_LOG_FOLDER,"./compose/.logs")  ;
+    private final static String FILE_PATH = System.getenv().getOrDefault(CONF_AZURITE_LOG_FOLDER, "./compose/.logs");
     private final static String FILE_FULL_NAME = FILE_PATH + "/" + FILE_NAME + ".log";
     private final static String FILE_FULL_SEEK_NAME = FILE_PATH + "/" + FILE_NAME + ".seek";
     protected final static String DATE_FORMAT = "dd/MMM/yyyy:HH:mm:ss XX";
-    private final static String EVENT_DATA_KEY = "event.data";
-    private final static String EVENT_LINE_KEY = "event.line";
+    public final static String EVENT_DATA_KEY = "event.data";
+    public final static String EVENT_LINE_KEY = "event.line";
 
-
-    private final static String AZURE_EVENT_TEMPLATE = """
-            ['{'
-              "source": "/subscriptions/azurite/resourceGroups/Storage/providers/Microsoft.Storage/storageAccounts/my-storage-account",
-              "subject": "{0}",
-              "type": "{1}",
-              "time": "{2}",
-              "id": "{3}",
-              "data": '{'
-                "api": "{4}",
-                "clientRequestId": "{5}",
-                "requestId": "{5}",
-                "eTag": "\\"{5}\\"",
-                "contentType": "application/octet-stream",
-                "contentLength": 0,
-                "blobType": "BlockBlob",
-                "url": "{6}",
-                "sequencer": "{7}",
-                "storageDiagnostics": '{'
-                  "batchId": "{5}"
-                }
-              '}',
-              "specversion": "1.0"
-            '}']
-            """;
 
     @Override
     public void configure() throws Exception {
 
         from("stream:file?fileName=" + FILE_FULL_NAME + "&scanStream=true&scanStreamDelay=1000")
-            .process(new FileSkipConsumedLineProcessor())
-            .choice()
+                .process(new FileSkipConsumedLineProcessor())
+                .choice()
                 .when(simple("${variable.skip_line} == 'ttrue'"))
-                //.log("skip line : [${header.event.line} ]")
+                .log(DEBUG, "skip line : [${variable.event.line} ]")
                 .otherwise()
-                    .to("direct:processLine")
-                .endChoice();     from("direct:processLine")
-            .process(new ParseLineProcessor())
-            .choice()
-                .when(simple("${header.event.data} == null "))
-                //.log("skip line not access : [ ${header.event.line} ]")
+                .to("direct:processLine")
+                .endChoice();
+        from("direct:processLine")
+                .process(new ParseLineProcessor())
+                .choice()
+                .when(simple("${variable.event.data} == null "))
+                .log(DEBUG, "skip line not access : [ ${variable.event.line} ]")
                 .otherwise()
-                    .to("direct:processAccessLine")
+                .to("direct:processAccessLine")
                 .endChoice();
         from("direct:processAccessLine")
-            .process(new AzuriteEventGeneratorProcessor())
-            .choice()
+                .process(new AzuriteEventGeneratorProcessor())
+                .choice()
                 .when(simple("${variable.skip_line} == 'true' "))
-                //.log("skip line not create or delete : [ ${header.event.line} ]")
+                .log(DEBUG, "skip line not create or delete : [ ${variable.event.line} ]")
                 .otherwise()
-                    .log("<<<<${header.CamelStreamIndex}|${variable.old_position}|${variable.skip_line}>>>> [ ${body} ]")
+                .log("<<<<${header.CamelStreamIndex}|${variable.old_position}|${variable.skip_line}>>>> [ ${body} ]")
+                .to("direct:sendToKafka")
                 .endChoice();
     }
 
@@ -90,7 +69,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
         @Override
         public void process(Exchange exchange) {
 
-            EventData eventData = (EventData) exchange.getMessage().getHeader(EVENT_DATA_KEY);
+            EventData eventData = (EventData) exchange.getVariable(EVENT_DATA_KEY);
 
             if (eventData != null) {
                 if (("PUT".equals(eventData.getMethod()) || ("DELETE".equals(eventData.getMethod())))
@@ -135,7 +114,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
         public void process(Exchange exchange) throws Exception {
             String regex = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/(\\S+)/(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
             String line = exchange.getMessage().getBody().toString();
-            exchange.getMessage().setHeader(EVENT_LINE_KEY, line);
+            exchange.setVariable(EVENT_LINE_KEY, line);
             Pattern p = Pattern.compile(regex);
             Matcher matcher = p.matcher(line);
             if (matcher.find()) {
@@ -151,7 +130,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 eventData.setSubject("/" + eventData.getAccount() + "/" + eventData.container + eventData.getFile());
                 eventData.setUrl(serverUrl + eventData.getSubject());
                 eventData.setStatus(Integer.valueOf(matcher.group(6)));
-                exchange.getMessage().setHeader(EVENT_DATA_KEY, eventData);
+                exchange.setVariable(EVENT_DATA_KEY, eventData);
             }
 
         }
@@ -273,4 +252,29 @@ public class AzuriteEventFromLog extends RouteBuilder {
                     '}';
         }
     }
+
+    private final static String AZURE_EVENT_TEMPLATE = """
+            ['{'
+              "source": "/subscriptions/azurite/resourceGroups/Storage/providers/Microsoft.Storage/storageAccounts/my-storage-account",
+              "subject": "{0}",
+              "type": "{1}",
+              "time": "{2}",
+              "id": "{3}",
+              "data": '{'
+                "api": "{4}",
+                "clientRequestId": "{5}",
+                "requestId": "{5}",
+                "eTag": "\\"{5}\\"",
+                "contentType": "application/octet-stream",
+                "contentLength": 0,
+                "blobType": "BlockBlob",
+                "url": "{6}",
+                "sequencer": "{7}",
+                "storageDiagnostics": '{'
+                  "batchId": "{5}"
+                }
+              '}',
+              "specversion": "1.0"
+            '}']
+            """;
 }

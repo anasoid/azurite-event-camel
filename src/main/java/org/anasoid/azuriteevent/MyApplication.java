@@ -7,8 +7,6 @@ import org.apache.camel.main.Main;
  */
 public final class MyApplication {
 
-    private MyApplication() {
-    }
 
     public static void main(String[] args) throws Exception {
         // use Camels Main class
