@@ -1,4 +1,4 @@
-package org.anasoid.azurite.event;
+package org.anasoid.azurite.event.routes;
 
 
 import org.junit.jupiter.api.Assertions;
@@ -34,7 +34,6 @@ class AzuriteEventFromLogTest {
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(AzuriteEventFromLog.DATE_FORMAT);
         Assertions.assertEquals(date, simpleDateFormat.format(simpleDateFormat.parse(date)));
     }
-
 
 
 }

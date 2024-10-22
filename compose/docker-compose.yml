@@ -12,4 +12,4 @@ services:
       service: azurite
 
 volumes:
-  logs:
+  logs-azurite:

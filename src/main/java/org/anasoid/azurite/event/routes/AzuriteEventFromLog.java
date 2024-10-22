@@ -1,6 +1,7 @@
-package org.anasoid.azurite.event;
+package org.anasoid.azurite.event.routes;
 
 import org.apache.camel.Exchange;
+import org.apache.camel.LoggingLevel;
 import org.apache.camel.Processor;
 import org.apache.camel.builder.RouteBuilder;
 
@@ -17,16 +18,19 @@ import java.util.UUID;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import static org.apache.camel.LoggingLevel.DEBUG;
 
 public class AzuriteEventFromLog extends RouteBuilder {
 
+    private final static Boolean SKIP_LINE = true;
+    private final static LoggingLevel DEBUG_LEVEL = LoggingLevel.DEBUG;
     private final static String CONF_AZURITE_URL = "AZURITE_URL";
-    private final static String CONF_AZURITE_LOG_FOLDER = "AZURITE_URL";
+    private final static String CONF_AZURITE_LOG_FOLDER = "AZURITE_LOG_FOLDER";
+    private final static String CONF_CAMEL_SEEK_FOLDER = "CAMEL_SEEK_FOLDER";
     private final static String FILE_NAME = "access-azurite";
     private final static String FILE_PATH = System.getenv().getOrDefault(CONF_AZURITE_LOG_FOLDER, "./compose/.logs");
+    private final static String FILE_PATH_SEEK = System.getenv().getOrDefault(CONF_CAMEL_SEEK_FOLDER, FILE_PATH);
     private final static String FILE_FULL_NAME = FILE_PATH + "/" + FILE_NAME + ".log";
-    private final static String FILE_FULL_SEEK_NAME = FILE_PATH + "/" + FILE_NAME + ".seek";
+    private final static String FILE_FULL_SEEK_NAME = FILE_PATH_SEEK + "/" + FILE_NAME + ".seek";
     protected final static String DATE_FORMAT = "dd/MMM/yyyy:HH:mm:ss XX";
     public final static String EVENT_DATA_KEY = "event.data";
     public final static String EVENT_LINE_KEY = "event.line";
@@ -38,8 +42,8 @@ public class AzuriteEventFromLog extends RouteBuilder {
         from("stream:file?fileName=" + FILE_FULL_NAME + "&scanStream=true&scanStreamDelay=1000")
                 .process(new FileSkipConsumedLineProcessor())
                 .choice()
-                .when(simple("${variable.skip_line} == 'ttrue'"))
-                .log(DEBUG, "skip line : [${variable.event.line} ]")
+                .when(simple("${variable.skip_line} == '" + SKIP_LINE.toString().toLowerCase() + "'"))
+                .log(DEBUG_LEVEL, "skip line : [${variable.event.line} ]")
                 .otherwise()
                 .to("direct:processLine")
                 .endChoice();
@@ -47,7 +51,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .process(new ParseLineProcessor())
                 .choice()
                 .when(simple("${variable.event.data} == null "))
-                .log(DEBUG, "skip line not access : [ ${variable.event.line} ]")
+                .log(DEBUG_LEVEL, "skip line not access : [ ${variable.event.line} ]")
                 .otherwise()
                 .to("direct:processAccessLine")
                 .endChoice();
@@ -55,7 +59,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .process(new AzuriteEventGeneratorProcessor())
                 .choice()
                 .when(simple("${variable.skip_line} == 'true' "))
-                .log(DEBUG, "skip line not create or delete : [ ${variable.event.line} ]")
+                .log(DEBUG_LEVEL, "skip line not create or delete : [ ${variable.event.line} ]")
                 .otherwise()
                 .log("<<<<${header.CamelStreamIndex}|${variable.old_position}|${variable.skip_line}>>>> [ ${body} ]")
                 .to("direct:sendToKafka")
