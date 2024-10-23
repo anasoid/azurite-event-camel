@@ -2,11 +2,9 @@ package org.anasoid.azurite.event.test;
 
 import org.apache.camel.builder.RouteBuilder;
 
-import java.util.Map;
-
 public class KafkaInTesting extends RouteBuilder {
 
-    private final static Map<String, String> TOPICS = Map.of();
+
     private final static String CONF_DEFAULT_TOPIC = "DEFAULT_TOPIC";
     private final static String DEFAULT_TOPIC = System.getenv().getOrDefault(CONF_DEFAULT_TOPIC, "azurite");
 

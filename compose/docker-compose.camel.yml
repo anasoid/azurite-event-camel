@@ -6,6 +6,9 @@ services:
     command:
       [
         "run",
+        "/src/Config.java",
+        "/src/EventData.java",
+        "/src/BodyFormater.java",
         "/src/AzuriteEventFromLog.java",
         "/src/KafkaOut.java",
         "/test/KafkaInTesting.java",
