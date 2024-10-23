@@ -25,8 +25,8 @@ public class AzuriteEventFromLog extends RouteBuilder {
     private final static String FILE_FULL_NAME = Config.FILE_PATH + "/" + FILE_NAME + ".log";
     private final static String FILE_FULL_SEEK_NAME = Config.FILE_PATH_SEEK + "/" + FILE_NAME + ".seek";
     protected final static String DATE_FORMAT = "dd/MMM/yyyy:HH:mm:ss XX";
-    public final static String EVENT_DATA_KEY = "event.data";
-    public final static String EVENT_LINE_KEY = "event.line";
+    public final static String EVENT_DATA_KEY = "event_data";
+    public final static String EVENT_LINE_KEY = "event_line";
 
 
     @Override
@@ -36,15 +36,15 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .process(new FileSkipConsumedLineProcessor())
                 .choice()
                 .when(simple("${variable.skip_line} == '" + SKIP_LINE.toString().toLowerCase() + "'"))
-                .log(DEBUG_LEVEL, "skip line : [${variable.event.line} ]")
+                .log(DEBUG_LEVEL, "skip line : [${variable.event_line} ]")
                 .otherwise()
                 .to("direct:processLine")
                 .endChoice();
         from("direct:processLine")
                 .process(new ParseLineProcessor())
                 .choice()
-                .when(simple("${variable.event.data} == null "))
-                .log(DEBUG_LEVEL, "skip line not access : [ ${variable.event.line} ]")
+                .when(simple("${variable.event_data} == null "))
+                .log(DEBUG_LEVEL, "skip line not access : [ ${variable.event_line} ]")
                 .otherwise()
                 .to("direct:processAccessLine")
                 .endChoice();
@@ -52,7 +52,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .process(new AzuriteEventGeneratorProcessor())
                 .choice()
                 .when(simple("${variable.skip_line} == 'true' "))
-                .log(DEBUG_LEVEL, "skip line not create or delete : [ ${variable.event.line} ]")
+                .log(DEBUG_LEVEL, "skip line not create or delete : [ ${variable.event_line} ]")
                 .otherwise()
                 .log(DEBUG_LEVEL, "CamelStreamIndex=${header.CamelStreamIndex}|old_position=${variable.old_position}|skip_line=${variable.skip_line} ]")
                 .log(">>>> [ ${body} ]")
