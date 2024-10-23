@@ -18,12 +18,15 @@ public class KafkaOut extends RouteBuilder {
     private final static String CONF_KAFKA_BROKER = "KAFKA_BROKER";
     private final static String BROKER = System.getenv().getOrDefault(CONF_KAFKA_BROKER, "localhost:9092");
 
+    private final static String CONF_KAFKA_ADDITIONAL_CONFIG = "KAFKA_ADDITIONAL_CONFIG";
+    private final static String KAFKA_ADDITIONAL_CONFIG = System.getenv().getOrDefault(CONF_KAFKA_ADDITIONAL_CONFIG, "");
+
 
     @Override
     public void configure() throws Exception {
         from("direct:sendToKafka")
                 .process(new PrepareKafka())
-                .to("kafka:" + DEFAULT_TOPIC + "?brokers=" + BROKER);
+                .to("kafka:" + DEFAULT_TOPIC + "?brokers=" + BROKER +KAFKA_ADDITIONAL_CONFIG);
     }
 
     /**

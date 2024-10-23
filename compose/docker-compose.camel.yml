@@ -1,27 +1,27 @@
 ---
 version: "3.9"
 services:
-  azurite:
+  camel:
     image: apache/camel-jbang:4.8.0
-    container_name: "azurite-camel"
     command:
       [
         "run",
         "/src/AzuriteEventFromLog.java",
         "/src/KafkaOut.java",
+        "/test/KafkaInTesting.java",
       ]
 
     environment:
       SRC_FOLDER: /
-      KAFKA_BROKER: host.docker.internal:29092
+      KAFKA_BROKER: kafka:29092
       AZURITE_URL: "http://127.0.0.1:10000"
       AZURITE_LOG_FOLDER: /logs
       CAMEL_SEEK_FOLDER: /
 
     volumes:
-      - ./src/main/java/org/anasoid/azurite/event/routes:/src
-      - ./compose/.logs:/logs
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+      - ../src/main/java/org/anasoid/azurite/event/routes:/src
+      - ../src/main/java/org/anasoid/azurite/event/test:/test
+      - azurite-logs:/logs
+
 volumes:
-  logs-azurite:
+  azurite-logs:

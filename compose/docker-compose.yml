@@ -1,15 +1,24 @@
-version: "3"
-
+---
+version: '3'
 services:
-  log-generator:
+  kafka:
     extends:
-      file: ./docker-compose.log-generator.yml
-      service: log-generator
-
+      file: docker-compose.kafka.yml
+      service: kafka
   azurite:
     extends:
-      file: ./docker-compose.azurite.yml
+      file: docker-compose.azurite.yml
       service: azurite
 
+  camel:
+    extends:
+      file: docker-compose.camel.yml
+      service: camel
+    depends_on:
+      - kafka
+networks:
+  default:
+    enable_ipv6: false
+
 volumes:
-  logs-azurite:
+  azurite-logs:
