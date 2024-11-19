@@ -70,11 +70,11 @@ public class AzuriteEventFromLog extends RouteBuilder {
             EventData eventData = (EventData) exchange.getVariable(EVENT_DATA_KEY);
 
             if (eventData != null) {
-                    if (("PUT".equals(eventData.getMethod()) || ("DELETE".equals(eventData.getMethod())))
-                            && (eventData.getStatus() < 210)) {
-                        exchange.setVariable("skip_line", Boolean.valueOf(false).toString().toLowerCase());
-                        String message = BodyFormater.formatBody(eventData, Config.AZURE_EVENT_FORMAT);
-                        exchange.getMessage().setBody(message);
+                if (("PUT".equals(eventData.getMethod()) || ("DELETE".equals(eventData.getMethod())))
+                        && (eventData.getStatus() < 210)) {
+                    exchange.setVariable("skip_line", Boolean.valueOf(false).toString().toLowerCase());
+                    String message = BodyFormater.formatBody(eventData, Config.AZURE_EVENT_FORMAT);
+                    exchange.getMessage().setBody(message);
                 } else {
                     exchange.setVariable("skip_line", Boolean.valueOf(true).toString().toLowerCase());
                 }
@@ -112,9 +112,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 eventData.setStatus(Integer.valueOf(matcher.group(6)));
                 exchange.setVariable(EVENT_DATA_KEY, eventData);
             }
-
         }
-
     }
 
 
