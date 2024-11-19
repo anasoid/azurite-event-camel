@@ -2,7 +2,7 @@
 version: "3.9"
 services:
   camel:
-    image: apache/camel-jbang:4.8.0
+    image: apache/camel-jbang:4.8.1
     command:
       [
         "run",

@@ -70,11 +70,11 @@ public class AzuriteEventFromLog extends RouteBuilder {
             EventData eventData = (EventData) exchange.getVariable(EVENT_DATA_KEY);
 
             if (eventData != null) {
-                if (("PUT".equals(eventData.getMethod()) || ("DELETE".equals(eventData.getMethod())))
-                        && (eventData.getStatus() < 210)) {
-                    exchange.setVariable("skip_line", Boolean.valueOf(false).toString().toLowerCase());
-                    String message = BodyFormater.formatBody(eventData, Config.AZURE_EVENT_FORMAT);
-                    exchange.getMessage().setBody(message);
+                    if (("PUT".equals(eventData.getMethod()) || ("DELETE".equals(eventData.getMethod())))
+                            && (eventData.getStatus() < 210)) {
+                        exchange.setVariable("skip_line", Boolean.valueOf(false).toString().toLowerCase());
+                        String message = BodyFormater.formatBody(eventData, Config.AZURE_EVENT_FORMAT);
+                        exchange.getMessage().setBody(message);
                 } else {
                     exchange.setVariable("skip_line", Boolean.valueOf(true).toString().toLowerCase());
                 }
@@ -94,13 +94,19 @@ public class AzuriteEventFromLog extends RouteBuilder {
             Pattern p = Pattern.compile(regex);
             Matcher matcher = p.matcher(line);
             if (matcher.find()) {
+                String url = matcher.group(5);
+                if (url.contains("blockid=")) {
+                    return;
+                }
                 EventData eventData = new EventData();
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(AzuriteEventFromLog.DATE_FORMAT);
                 eventData.setDate(simpleDateFormat.parse(matcher.group(1)));
                 eventData.setMethod(matcher.group(2));
                 eventData.setAccount(matcher.group(3));
                 eventData.setContainer(matcher.group(4));
-                eventData.setFile("/" + URLDecoder.decode(matcher.group(5).split("\\?")[0]));
+
+
+                eventData.setFile("/" + URLDecoder.decode(url.split("\\?")[0]));
                 eventData.setSubject("/" + eventData.getAccount() + "/" + eventData.getContainer() + eventData.getFile());
                 eventData.setUrl(Config.AZURITE_URL + eventData.getSubject());
                 eventData.setStatus(Integer.valueOf(matcher.group(6)));

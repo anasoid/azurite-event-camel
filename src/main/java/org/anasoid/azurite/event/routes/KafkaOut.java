@@ -12,7 +12,9 @@ public class KafkaOut extends RouteBuilder {
         from("direct:sendToKafka")
                 .choice()
                 .when(simple("${variable.event_data.container} == 'default' "))
+                .log("to kafka ")
                 .to("kafka:" + Config.DEFAULT_TOPIC + "?brokers=" + Config.BROKER + Config.KAFKA_ADDITIONAL_CONFIG)
+                .endChoice()
                 .otherwise()
                 .log("NO TOPIC for  container : ${variable.event_data.container}")
                 .endChoice();

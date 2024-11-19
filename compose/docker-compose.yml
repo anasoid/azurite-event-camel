@@ -5,6 +5,13 @@ services:
     extends:
       file: docker-compose.kafka.yml
       service: kafka
+  kafka-ui:
+    extends:
+      file: docker-compose.kafka.yml
+      service: kafka-ui
+    depends_on:
+      - kafka
+
   azurite:
     extends:
       file: docker-compose.azurite.yml
