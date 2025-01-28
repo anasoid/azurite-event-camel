@@ -88,13 +88,13 @@ public class AzuriteEventFromLog extends RouteBuilder {
     class ParseLineProcessor implements Processor {
         @Override
         public void process(Exchange exchange) throws Exception {
-            String regex = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/(\\S+)/(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
+            String regex = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/([0-9a-zA-Z_\\-]+)(/|%2F)(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
             String line = exchange.getMessage().getBody().toString();
             exchange.setVariable(EVENT_LINE_KEY, line);
             Pattern p = Pattern.compile(regex);
             Matcher matcher = p.matcher(line);
             if (matcher.find()) {
-                String url = matcher.group(5);
+                String url = matcher.group(6);
                 if (url.contains("blockid=")) {
                     return;
                 }
@@ -109,7 +109,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 eventData.setFile("/" + URLDecoder.decode(url.split("\\?")[0]));
                 eventData.setSubject("/" + eventData.getAccount() + "/" + eventData.getContainer() + eventData.getFile());
                 eventData.setUrl(Config.AZURITE_URL + eventData.getSubject());
-                eventData.setStatus(Integer.valueOf(matcher.group(6)));
+                eventData.setStatus(Integer.valueOf(matcher.group(7)));
                 exchange.setVariable(EVENT_DATA_KEY, eventData);
             }
         }
