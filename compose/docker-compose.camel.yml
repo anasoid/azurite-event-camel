@@ -2,7 +2,7 @@
 version: "3.9"
 services:
   camel:
-    image: apache/camel-jbang:4.8.1
+    image: apache/camel-jbang:4.8.3
     command:
       [
         "run",
@@ -11,15 +11,18 @@ services:
         "/src/BodyFormater.java",
         "/src/AzuriteEventFromLog.java",
         "/src/KafkaOut.java",
+        "/src/AmqpOut.java",
         "/test/KafkaInTesting.java",
       ]
 
     environment:
       SRC_FOLDER: /
+      TARGET_NAME: AMQP
       KAFKA_BROKER: kafka:29092
       AZURITE_URL: "http://127.0.0.1:10000"
       AZURITE_LOG_FOLDER: /logs
       CAMEL_SEEK_FOLDER: /
+      AMQP_URI: "amqp://servicebus:5672"
 
     volumes:
       - ../src/main/java/org/anasoid/azurite/event/routes:/src
