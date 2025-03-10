@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -20,7 +21,7 @@ import java.util.regex.Pattern;
 public class AzuriteEventFromLog extends RouteBuilder {
 
     private final static Boolean SKIP_LINE = "true".equalsIgnoreCase(System.getenv().getOrDefault("SKIP_LINE", "true"));
-    private final static LoggingLevel DEBUG_LEVEL = LoggingLevel.DEBUG;
+    private final static LoggingLevel DEBUG_LEVEL = LoggingLevel.INFO;
 
     private final static String FILE_NAME = "access-azurite";
     private final static String FILE_FULL_NAME = Config.FILE_PATH + "/" + FILE_NAME + ".log";
@@ -45,7 +46,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .process(new ParseLineProcessor())
                 .choice()
                 .when(simple("${variable.event_data} == null "))
-                .log(DEBUG_LEVEL, "skip line not access : [ ${variable.event_line} ]")
+                .log(DEBUG_LEVEL, "skip line not access action: [ ${variable.event_line} ]")
                 .otherwise()
                 .to("direct:processAccessLine")
                 .endChoice();
@@ -54,14 +55,20 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .choice()
                 .when(simple("${variable.skip_line} == 'true' "))
                 .log(DEBUG_LEVEL, "skip line not create or delete : [ ${variable.event_line} ]")
+                .endChoice()
                 .otherwise()
                 .log(DEBUG_LEVEL, "CamelStreamIndex=${header.CamelStreamIndex}|old_position=${variable.old_position}|skip_line=${variable.skip_line} ]")
                 .log(">>>> [ ${body} ]")
+                .to("direct:sendToBroker");
+        from("direct:sendToBroker")
+                .process(new AzuriteEventGeneratorProcessor())
+                .choice()
                 .when(t -> Config.IS_AMQP_TARGET)
-                .to("direct:sendToAmqp")
+                .to("direct:sendToAmqp").endChoice()
                 .when(t -> Config.IS_KAFKA_TARGET)
-                .to("direct:sendToKafka")
-                .endChoice();
+                .to("direct:sendToKafka").endChoice()
+                .otherwise()
+                .log("No broker configured");
     }
 
     /**
@@ -89,18 +96,28 @@ public class AzuriteEventFromLog extends RouteBuilder {
 
     }
 
-    class ParseLineProcessor implements Processor {
+    public static class ParseLineProcessor implements Processor {
+        String REGEX = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/([0-9a-zA-Z_\\-]+)(/|%2F)(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
+        Pattern ACCESS_PATTERN = Pattern.compile(REGEX);
+
         @Override
         public void process(Exchange exchange) throws Exception {
-            String regex = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/([0-9a-zA-Z_\\-]+)(/|%2F)(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
             String line = exchange.getMessage().getBody().toString();
             exchange.setVariable(EVENT_LINE_KEY, line);
-            Pattern p = Pattern.compile(regex);
-            Matcher matcher = p.matcher(line);
+            EventData eventData = this.parse(line);
+            if (eventData != null) {
+                exchange.setVariable(EVENT_DATA_KEY, eventData);
+            }
+        }
+
+        public EventData parse(String line) throws ParseException {
+
+
+            Matcher matcher = ACCESS_PATTERN.matcher(line);
             if (matcher.find()) {
                 String url = matcher.group(6);
                 if (url.contains("blockid=")) {
-                    return;
+                    return null;
                 }
                 EventData eventData = new EventData();
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(AzuriteEventFromLog.DATE_FORMAT, Locale.ENGLISH);
@@ -114,9 +131,12 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 eventData.setSubject("/" + eventData.getAccount() + "/" + eventData.getContainer() + eventData.getFile());
                 eventData.setUrl(Config.AZURITE_URL + eventData.getSubject());
                 eventData.setStatus(Integer.valueOf(matcher.group(7)));
-                exchange.setVariable(EVENT_DATA_KEY, eventData);
+                return eventData;
             }
+            return null;
         }
+
+
     }
 
 

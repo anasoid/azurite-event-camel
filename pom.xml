@@ -11,7 +11,7 @@
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <log4j2-version>2.13.3</log4j2-version>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <camel.version>4.8.3</camel.version>
+        <camel.version>4.10.2</camel.version>
     </properties>
     <dependencyManagement>
         <dependencies>
