@@ -12,6 +12,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
 import java.text.SimpleDateFormat;
+import java.util.Locale;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -24,7 +25,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
     private final static String FILE_NAME = "access-azurite";
     private final static String FILE_FULL_NAME = Config.FILE_PATH + "/" + FILE_NAME + ".log";
     private final static String FILE_FULL_SEEK_NAME = Config.FILE_PATH_SEEK + "/" + FILE_NAME + ".seek";
-    protected final static String DATE_FORMAT = "dd/MMM/yyyy:HH:mm:ss XX";
+    protected final static String DATE_FORMAT = "dd/MMM/yyyy:HH:mm:ss ZZ";
     public final static String EVENT_DATA_KEY = "event_data";
     public final static String EVENT_LINE_KEY = "event_line";
 
@@ -56,6 +57,9 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .otherwise()
                 .log(DEBUG_LEVEL, "CamelStreamIndex=${header.CamelStreamIndex}|old_position=${variable.old_position}|skip_line=${variable.skip_line} ]")
                 .log(">>>> [ ${body} ]")
+                .when(t -> Config.IS_AMQP_TARGET)
+                .to("direct:sendToAmqp")
+                .when(t -> Config.IS_KAFKA_TARGET)
                 .to("direct:sendToKafka")
                 .endChoice();
     }
@@ -99,7 +103,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
                     return;
                 }
                 EventData eventData = new EventData();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(AzuriteEventFromLog.DATE_FORMAT);
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(AzuriteEventFromLog.DATE_FORMAT, Locale.ENGLISH);
                 eventData.setDate(simpleDateFormat.parse(matcher.group(1)));
                 eventData.setMethod(matcher.group(2));
                 eventData.setAccount(matcher.group(3));

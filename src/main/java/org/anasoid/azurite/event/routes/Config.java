@@ -12,10 +12,20 @@ public final class Config {
     //AZURE
     private final static String CONF_AZURE_EVENT_FORMAT = "AZURE_EVENT_FORMAT";// grid or cloud
     public final static String AZURE_EVENT_FORMAT = System.getenv().getOrDefault(CONF_AZURE_EVENT_FORMAT, "grid");
-    //KAFKA
+
+    //TARGET
+    private final static String CONF_TARGET_NAME = "TARGET_NAME";
+    public final static String TARGET_NAME = System.getenv().getOrDefault(CONF_TARGET_NAME, "AMQP");
+    public final static Boolean IS_AMQP_TARGET = TARGET_NAME.equals("AMQP");
+    public final static Boolean IS_KAFKA_TARGET = TARGET_NAME.equals("KAFKA");
+
     private final static String CONF_DEFAULT_TOPIC = "DEFAULT_TOPIC";
     public final static String DEFAULT_TOPIC = System.getenv().getOrDefault(CONF_DEFAULT_TOPIC, "azurite");
 
+    //AMQP
+    private final static String CONF_AMQP_URI = "AMQP_URI";
+    public static final String AMQP_URI = System.getenv().getOrDefault(CONF_AMQP_URI, "amqp://localhost");
+    //KAFKA
     private final static String CONF_KAFKA_BROKER = "KAFKA_BROKER";
     public final static String BROKER = System.getenv().getOrDefault(CONF_KAFKA_BROKER, "localhost:9092");
 

@@ -23,6 +23,19 @@ services:
       service: camel
     depends_on:
       - kafka
+
+  servicebus:
+    extends:
+      file: servicebus/docker-compose.servicebus.yml
+      service: servicebus
+    depends_on:
+      - sqledge
+
+  sqledge:
+    extends:
+      file: servicebus/docker-compose.sqledge.yml
+      service: sqledge
+
 networks:
   default:
     enable_ipv6: false
