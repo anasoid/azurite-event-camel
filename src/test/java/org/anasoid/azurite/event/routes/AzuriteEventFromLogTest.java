@@ -1,6 +1,7 @@
 package org.anasoid.azurite.event.routes;
 
 
+import org.anasoid.azurite.event.routes.AzuriteEventFromLog.ParseLineProcessor;
 import org.junit.jupiter.api.Assertions;
 import org.junit.jupiter.api.Test;
 
@@ -33,6 +34,19 @@ class AzuriteEventFromLogTest {
         String date = "17/Oct/2024:16:18:21 +0100";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(AzuriteEventFromLog.DATE_FORMAT);
         Assertions.assertEquals(date, simpleDateFormat.format(simpleDateFormat.parse(date)));
+    }
+
+
+    @Test
+    void parseLines() throws ParseException {
+        String line = "192.168.240.1 - - [10/Mar/2025:15:02:01 +0000] \"PUT /devstoreaccount1/referential/referential_category0.xml HTTP/1.1\" 201 -";
+        String account = "devstoreaccount1";
+        String file = "/referential_category0.xml";
+        ParseLineProcessor parseLineProcessor = new ParseLineProcessor();
+        EventData eventData = parseLineProcessor.parse(line);
+        Assertions.assertNotNull(eventData);
+        Assertions.assertEquals(eventData.getAccount(),account);
+        Assertions.assertEquals(eventData.getFile(),file);
     }
 
 

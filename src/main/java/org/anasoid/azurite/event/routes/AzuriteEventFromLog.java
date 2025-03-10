@@ -11,6 +11,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardOpenOption;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Locale;
 import java.util.regex.Matcher;
@@ -89,18 +90,26 @@ public class AzuriteEventFromLog extends RouteBuilder {
 
     }
 
-    class ParseLineProcessor implements Processor {
+    public static class ParseLineProcessor implements Processor {
+        String REGEX = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/([0-9a-zA-Z_\\-]+)(/|%2F)(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
+        Pattern ACCESS_PATTERN = Pattern.compile(REGEX);
+
         @Override
         public void process(Exchange exchange) throws Exception {
-            String regex = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/([0-9a-zA-Z_\\-]+)(/|%2F)(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
-            String line = exchange.getMessage().getBody().toString();
-            exchange.setVariable(EVENT_LINE_KEY, line);
-            Pattern p = Pattern.compile(regex);
-            Matcher matcher = p.matcher(line);
+            EventData eventData = parse(exchange.getMessage().getBody().toString());
+            if (eventData != null) {
+                exchange.setVariable(EVENT_DATA_KEY, eventData);
+            }
+        }
+
+        public EventData parse(String line) throws ParseException {
+
+
+            Matcher matcher = ACCESS_PATTERN.matcher(line);
             if (matcher.find()) {
                 String url = matcher.group(6);
                 if (url.contains("blockid=")) {
-                    return;
+                    return null;
                 }
                 EventData eventData = new EventData();
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat(AzuriteEventFromLog.DATE_FORMAT, Locale.ENGLISH);
@@ -114,9 +123,12 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 eventData.setSubject("/" + eventData.getAccount() + "/" + eventData.getContainer() + eventData.getFile());
                 eventData.setUrl(Config.AZURITE_URL + eventData.getSubject());
                 eventData.setStatus(Integer.valueOf(matcher.group(7)));
-                exchange.setVariable(EVENT_DATA_KEY, eventData);
+                return eventData;
             }
+            return null;
         }
+
+
     }
 
 
