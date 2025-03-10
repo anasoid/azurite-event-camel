@@ -8,7 +8,7 @@ services:
       [
         "/bin/sh",
         "-c",
-        "azurite -l /data --blobHost 0.0.0.0  --queueHost 0.0.0.0 --tableHost  0.0.0.0 | tee /logs/access-azurite.log",
+        "azurite -l /data --blobHost 0.0.0.0  --queueHost 0.0.0.0 --tableHost  0.0.0.0 | tee -a /logs/access-azurite.log",
       ]
     ports:
       - "0.0.0.0:${AZURITE_PORT:-10000}:10000"

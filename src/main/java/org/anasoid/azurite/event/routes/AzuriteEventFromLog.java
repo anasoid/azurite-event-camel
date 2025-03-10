@@ -21,7 +21,7 @@ import java.util.regex.Pattern;
 public class AzuriteEventFromLog extends RouteBuilder {
 
     private final static Boolean SKIP_LINE = "true".equalsIgnoreCase(System.getenv().getOrDefault("SKIP_LINE", "true"));
-    private final static LoggingLevel DEBUG_LEVEL = LoggingLevel.DEBUG;
+    private final static LoggingLevel DEBUG_LEVEL = LoggingLevel.INFO;
 
     private final static String FILE_NAME = "access-azurite";
     private final static String FILE_FULL_NAME = Config.FILE_PATH + "/" + FILE_NAME + ".log";
@@ -46,7 +46,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .process(new ParseLineProcessor())
                 .choice()
                 .when(simple("${variable.event_data} == null "))
-                .log(DEBUG_LEVEL, "skip line not access : [ ${variable.event_line} ]")
+                .log(DEBUG_LEVEL, "skip line not access action: [ ${variable.event_line} ]")
                 .otherwise()
                 .to("direct:processAccessLine")
                 .endChoice();
@@ -55,14 +55,20 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .choice()
                 .when(simple("${variable.skip_line} == 'true' "))
                 .log(DEBUG_LEVEL, "skip line not create or delete : [ ${variable.event_line} ]")
+                .endChoice()
                 .otherwise()
                 .log(DEBUG_LEVEL, "CamelStreamIndex=${header.CamelStreamIndex}|old_position=${variable.old_position}|skip_line=${variable.skip_line} ]")
                 .log(">>>> [ ${body} ]")
+                .to("direct:sendToBroker");
+        from("direct:sendToBroker")
+                .process(new AzuriteEventGeneratorProcessor())
+                .choice()
                 .when(t -> Config.IS_AMQP_TARGET)
-                .to("direct:sendToAmqp")
+                .to("direct:sendToAmqp").endChoice()
                 .when(t -> Config.IS_KAFKA_TARGET)
-                .to("direct:sendToKafka")
-                .endChoice();
+                .to("direct:sendToKafka").endChoice()
+                .otherwise()
+                .log("No broker configured");
     }
 
     /**
@@ -96,7 +102,9 @@ public class AzuriteEventFromLog extends RouteBuilder {
 
         @Override
         public void process(Exchange exchange) throws Exception {
-            EventData eventData = parse(exchange.getMessage().getBody().toString());
+            String line = exchange.getMessage().getBody().toString();
+            exchange.setVariable(EVENT_LINE_KEY, line);
+            EventData eventData = this.parse(line);
             if (eventData != null) {
                 exchange.setVariable(EVENT_DATA_KEY, eventData);
             }
