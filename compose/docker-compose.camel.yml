@@ -11,9 +11,10 @@ services:
         "/src/EventData.java",
         "/src/BodyFormater.java",
         "/src/AzuriteEventFromLog.java",
-        "/src/AmqpOut.java",
-        "/src/KafkaOut.java",
-        "/src/BlobQueueOut.java"
+        "/src/BrokerSender.java",
+        "/src/out/AmqpOut.java",
+        "/src/out/KafkaOut.java",
+        "/src/out/BlobQueueOut.java"
       ]
 
     environment:

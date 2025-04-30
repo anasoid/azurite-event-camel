@@ -1,4 +1,4 @@
-package org.anasoid.azurite.event.routes;
+package org.anasoid.azurite.event.routes.out;
 
 // camel-k: dependency=camel-azure-storage-queue
 // camel-k: dependency=com.azure:azure-storage-queue:12.24.1
@@ -6,6 +6,7 @@ package org.anasoid.azurite.event.routes;
 import com.azure.storage.common.StorageSharedKeyCredential;
 import com.azure.storage.queue.QueueServiceClient;
 import com.azure.storage.queue.QueueServiceClientBuilder;
+import org.anasoid.azurite.event.routes.Config;
 import org.apache.camel.builder.RouteBuilder;
 
 public class BlobQueueOut extends RouteBuilder {

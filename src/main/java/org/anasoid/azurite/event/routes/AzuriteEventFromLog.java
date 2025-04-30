@@ -59,21 +59,11 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .otherwise()
                 .log(DEBUG_LEVEL, "CamelStreamIndex=${header.CamelStreamIndex}|old_position=${variable.old_position}|skip_line=${variable.skip_line} ]")
                 .log(">>>> [ ${body} ]")
-                .to("direct:sendToBroker");
-        from("direct:sendToBroker")
+                .to("direct:prepareSendToBroker");
+        from("direct:prepareSendToBroker")
                 .process(new AzuriteEventGeneratorProcessor())
-                .choice()
-                .when(t -> Config.IS_AMQP_TARGET)
-                .to("direct:sendToAmqp").endChoice()
-                .endChoice()
-                .when(t -> Config.IS_KAFKA_TARGET)
-                .to("direct:sendToKafka").endChoice()
-                .endChoice()
-                .when(t -> Config.IS_BLOB_QUEUE_TARGET)
-                .to("direct:sendToBlobQueue").endChoice()
-                .endChoice()
-                .otherwise()
-                .log("No broker configured");
+                .to("direct:sendToBroker");
+
     }
 
     /**
