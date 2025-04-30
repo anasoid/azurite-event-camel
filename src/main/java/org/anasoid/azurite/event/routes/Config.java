@@ -18,10 +18,18 @@ public final class Config {
     public final static String TARGET_NAME = System.getenv().getOrDefault(CONF_TARGET_NAME, "AMQP");
     public final static Boolean IS_AMQP_TARGET = TARGET_NAME.equals("AMQP");
     public final static Boolean IS_KAFKA_TARGET = TARGET_NAME.equals("KAFKA");
+    public final static Boolean IS_BLOB_QUEUE_TARGET = TARGET_NAME.equals("BLOB_QUEUE");
 
     private final static String CONF_DEFAULT_TOPIC = "DEFAULT_TOPIC";
     public final static String DEFAULT_TOPIC = System.getenv().getOrDefault(CONF_DEFAULT_TOPIC, "azurite");
 
+    //BLOB_QUEUE
+    private final static String CONF_BLOB_QUEUE_ENDPOINT = "BLOB_QUEUE_ENDPOINT";
+    public static final String BLOB_QUEUE_ENDPOINT = System.getenv().getOrDefault(CONF_BLOB_QUEUE_ENDPOINT, "http://localhost:10001");
+    private final static String CONF_BLOB_QUEUE_ACCOUNT_NAME = "BLOB_QUEUE_ACCOUNT_NAME";
+    public static final String BLOB_QUEUE_ACCOUNT_NAME = System.getenv().getOrDefault(CONF_BLOB_QUEUE_ACCOUNT_NAME, "devstoreaccount1");
+    private final static String CONF_BLOB_QUEUE_ACCESS_KEY = "BLOB_QUEUE_ACCESS_KEY";
+    public static final String BLOB_QUEUE_ACCESS_KEY = System.getenv().getOrDefault(CONF_BLOB_QUEUE_ACCESS_KEY, "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==");
     //AMQP
     private final static String CONF_AMQP_URI = "AMQP_URI";
     public static final String AMQP_URI = System.getenv().getOrDefault(CONF_AMQP_URI, "amqp://localhost");

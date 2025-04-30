@@ -65,8 +65,13 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .choice()
                 .when(t -> Config.IS_AMQP_TARGET)
                 .to("direct:sendToAmqp").endChoice()
+                .endChoice()
                 .when(t -> Config.IS_KAFKA_TARGET)
                 .to("direct:sendToKafka").endChoice()
+                .endChoice()
+                .when(t -> Config.IS_BLOB_QUEUE_TARGET)
+                .to("direct:sendToBlobQueue").endChoice()
+                .endChoice()
                 .otherwise()
                 .log("No broker configured");
     }

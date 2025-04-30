@@ -24,7 +24,8 @@
     "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-util-json-4.8.0.jar",
     "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-bean-4.8.0.jar",
     "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-base-engine-4.8.0.jar",
-    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-util-4.8.0.jar"
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/camel-util-4.8.0.jar",
+    "/home/anas/.config/Code/User/globalStorage/redhat.vscode-camelk/java-dependencies/*.jar"
   ],
   "java.project.sourcePaths": ["./src/main"],
   "maven.view": "flat"
