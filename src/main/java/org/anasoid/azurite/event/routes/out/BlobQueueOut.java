@@ -39,7 +39,7 @@ public class BlobQueueOut extends RouteBuilder {
                 .choice()
                 .when(simple("${variable.event_data.container} == 'default' "))
                 .log("to BlobQueue ")
-                .to("azure-storage-queue://" + accountName + "/" + "myqueue" + "?serviceClient=#blobClient&createQueue=true")
+                .to("azure-storage-queue://" + accountName + "/" + "default" + "?serviceClient=#blobClient&createQueue=true")
                 .endChoice()
                 .otherwise()
                 .log("NO TOPIC for  container : ${variable.event_data.container}")

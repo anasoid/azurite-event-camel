@@ -45,9 +45,56 @@ class AzuriteEventFromLogTest {
         ParseLineProcessor parseLineProcessor = new ParseLineProcessor();
         EventData eventData = parseLineProcessor.parse(line);
         Assertions.assertNotNull(eventData);
-        Assertions.assertEquals(eventData.getAccount(),account);
-        Assertions.assertEquals(eventData.getFile(),file);
+        Assertions.assertEquals(eventData.getAccount(), account);
+        Assertions.assertEquals(eventData.getContainer(), "referential");
+        Assertions.assertEquals(eventData.getMethod(), "PUT");
+        Assertions.assertEquals(eventData.getFile(), file);
+        Assertions.assertEquals(eventData.getStatus(), 201);
     }
 
+    @Test
+    void parseDeleteLine() throws ParseException {
+        String line = "192.168.32.1 - - [30/Apr/2025:19:16:14 +0000] \"DELETE /devstoreaccount1/default/messages/f047d33d-4da9-4592-8a11-6b2c5bad521d?popreceipt=MzBBcHIyMDI1MTk6MTY6MTQ1OTNl&timeout=30 HTTP/1.1\" 204 -";
+        String account = "devstoreaccount1";
+        String file = "/messages/f047d33d-4da9-4592-8a11-6b2c5bad521d";
+        ParseLineProcessor parseLineProcessor = new ParseLineProcessor();
+        EventData eventData = parseLineProcessor.parse(line);
+        Assertions.assertNotNull(eventData);
+        Assertions.assertEquals(eventData.getAccount(), account);
+        Assertions.assertEquals(eventData.getContainer(), "default");
+        Assertions.assertEquals(eventData.getMethod(), "DELETE");
+        Assertions.assertEquals(eventData.getFile(), file);
+        Assertions.assertEquals(eventData.getStatus(), 204);
+    }
+
+    @Test
+    void parseDeleteLineMultiFodler() throws ParseException {
+        String line = "192.168.32.1 - - [30/Apr/2025:19:14:37 +0000] \"DELETE /devstoreaccount1/default/messages%2Fmessages%2F52f68323-8861-4935-aa9a-928696113ca2?se=2025-05-30T19%3A14%3A35Z&sig=l7aJ0dJWI6RD%2FZxW8b3SXGm%2BHBH0KAFXkHd5e7grmYc%3D&sp=rdl&sr=c&sv=2018-03-28 HTTP/1.1\" 202 -";
+        String account = "devstoreaccount1";
+        String file = "/messages/messages/52f68323-8861-4935-aa9a-928696113ca2";
+        ParseLineProcessor parseLineProcessor = new ParseLineProcessor();
+        EventData eventData = parseLineProcessor.parse(line);
+        Assertions.assertNotNull(eventData);
+        Assertions.assertEquals(eventData.getAccount(), account);
+        Assertions.assertEquals(eventData.getContainer(), "default");
+        Assertions.assertEquals(eventData.getMethod(), "DELETE");
+        Assertions.assertEquals(eventData.getFile(), file);
+        Assertions.assertEquals(eventData.getStatus(), 202);
+    }
+
+    @Test
+    void parseDeleteMessage() throws ParseException {
+        String line = "192.168.32.1 - - [30/Apr/2025:19:16:14 +0000] \"DELETE /devstoreaccount1/default/messages/f047d33d-4da9-4592-8a11-6b2c5bad521d?popreceipt=MzBBcHIyMDI1MTk6MTY6MTQ1OTNl&timeout=30 HTTP/1.1\" 204 -";
+        String account = "devstoreaccount1";
+        String file = "/messages/f047d33d-4da9-4592-8a11-6b2c5bad521d";
+        ParseLineProcessor parseLineProcessor = new ParseLineProcessor();
+        EventData eventData = parseLineProcessor.parse(line);
+        Assertions.assertNotNull(eventData);
+        Assertions.assertEquals(eventData.getAccount(), account);
+        Assertions.assertEquals(eventData.getContainer(), "default");
+        Assertions.assertEquals(eventData.getMethod(), "DELETE");
+        Assertions.assertEquals(eventData.getFile(), file);
+        Assertions.assertEquals(eventData.getStatus(), 204);
+    }
 
 }

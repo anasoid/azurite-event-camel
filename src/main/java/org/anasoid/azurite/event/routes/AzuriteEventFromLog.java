@@ -92,7 +92,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
     }
 
     public static class ParseLineProcessor implements Processor {
-        String REGEX = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/([0-9a-zA-Z_\\-]+)(/|%2F)(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
+        String REGEX = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /([0-9a-zA-Z_\\-]+)/([0-9a-zA-Z_\\-]+)(/|%2F)(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
         Pattern ACCESS_PATTERN = Pattern.compile(REGEX);
 
         @Override
@@ -112,6 +112,9 @@ public class AzuriteEventFromLog extends RouteBuilder {
             if (matcher.find()) {
                 String url = matcher.group(6);
                 if (url.contains("blockid=")) {
+                    return null;
+                }
+                if (url.contains("popreceipt=")) {
                     return null;
                 }
                 EventData eventData = new EventData();
