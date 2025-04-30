@@ -9,6 +9,9 @@ import com.azure.storage.queue.QueueServiceClientBuilder;
 import org.anasoid.azurite.event.routes.Config;
 import org.apache.camel.builder.RouteBuilder;
 
+import java.nio.charset.StandardCharsets;
+import java.util.Base64;
+
 public class BlobQueueOut extends RouteBuilder {
 
 
@@ -36,6 +39,11 @@ public class BlobQueueOut extends RouteBuilder {
 
 
         from("direct:sendToBlobQueue")
+                .process(exchange -> {
+                    if (Config.BLOB_QUEUE_USE_BASE64) {
+                        exchange.getIn().setBody(Base64.getEncoder().encodeToString(exchange.getIn().getBody(String.class).getBytes(StandardCharsets.UTF_8)));
+                    }
+                })
                 .choice()
                 .when(simple("${variable.event_data.container} == 'default' "))
                 .log("to BlobQueue ")

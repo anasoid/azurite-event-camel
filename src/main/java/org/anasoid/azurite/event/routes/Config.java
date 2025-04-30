@@ -30,6 +30,9 @@ public final class Config {
     public static final String BLOB_QUEUE_ACCOUNT_NAME = System.getenv().getOrDefault(CONF_BLOB_QUEUE_ACCOUNT_NAME, "devstoreaccount1");
     private final static String CONF_BLOB_QUEUE_ACCESS_KEY = "BLOB_QUEUE_ACCESS_KEY";
     public static final String BLOB_QUEUE_ACCESS_KEY = System.getenv().getOrDefault(CONF_BLOB_QUEUE_ACCESS_KEY, "Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==");
+    private final static String CONF_BLOB_QUEUE_USE_BASE64 = "BLOB_QUEUE_USE_BASE64";
+    public static final boolean BLOB_QUEUE_USE_BASE64 = Boolean.valueOf(System.getenv().getOrDefault(CONF_BLOB_QUEUE_USE_BASE64, "true"));
+
     //AMQP
     private final static String CONF_AMQP_URI = "AMQP_URI";
     public static final String AMQP_URI = System.getenv().getOrDefault(CONF_AMQP_URI, "amqp://localhost");
