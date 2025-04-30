@@ -59,16 +59,11 @@ public class AzuriteEventFromLog extends RouteBuilder {
                 .otherwise()
                 .log(DEBUG_LEVEL, "CamelStreamIndex=${header.CamelStreamIndex}|old_position=${variable.old_position}|skip_line=${variable.skip_line} ]")
                 .log(">>>> [ ${body} ]")
-                .to("direct:sendToBroker");
-        from("direct:sendToBroker")
+                .to("direct:prepareSendToBroker");
+        from("direct:prepareSendToBroker")
                 .process(new AzuriteEventGeneratorProcessor())
-                .choice()
-                .when(t -> Config.IS_AMQP_TARGET)
-                .to("direct:sendToAmqp").endChoice()
-                .when(t -> Config.IS_KAFKA_TARGET)
-                .to("direct:sendToKafka").endChoice()
-                .otherwise()
-                .log("No broker configured");
+                .to("direct:sendToBroker");
+
     }
 
     /**
@@ -81,7 +76,9 @@ public class AzuriteEventFromLog extends RouteBuilder {
             EventData eventData = (EventData) exchange.getVariable(EVENT_DATA_KEY);
 
             if (eventData != null) {
-                if (("PUT".equals(eventData.getMethod()) || ("DELETE".equals(eventData.getMethod())))
+                if
+                ((("PUT".equals(eventData.getMethod()) && !Config.IGNORE_CREATE) ||
+                        ("DELETE".equals(eventData.getMethod()) && !Config.IGNORE_DELETE))
                         && (eventData.getStatus() < 210)) {
                     exchange.setVariable("skip_line", Boolean.valueOf(false).toString().toLowerCase());
                     String message = BodyFormater.formatBody(eventData, Config.AZURE_EVENT_FORMAT);
@@ -97,7 +94,7 @@ public class AzuriteEventFromLog extends RouteBuilder {
     }
 
     public static class ParseLineProcessor implements Processor {
-        String REGEX = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /(\\S+)/([0-9a-zA-Z_\\-]+)(/|%2F)(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
+        String REGEX = "^[\\d.]+ \\S+ \\S+ \\[([\\w:/]+\\s[+-]\\d{4})\\] \\\"(\\S+) /([0-9a-zA-Z_\\-]+)/([0-9a-zA-Z_\\-]+)(/|%2F)(.+?) HTTP/.{1,3}\\\" (\\d{3}) (\\S+)";
         Pattern ACCESS_PATTERN = Pattern.compile(REGEX);
 
         @Override
@@ -117,6 +114,9 @@ public class AzuriteEventFromLog extends RouteBuilder {
             if (matcher.find()) {
                 String url = matcher.group(6);
                 if (url.contains("blockid=")) {
+                    return null;
+                }
+                if (url.contains("popreceipt=")) {
                     return null;
                 }
                 EventData eventData = new EventData();

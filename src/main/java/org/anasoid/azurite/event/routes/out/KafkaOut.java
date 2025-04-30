@@ -1,6 +1,7 @@
-package org.anasoid.azurite.event.routes;
+package org.anasoid.azurite.event.routes.out;
 
 
+import org.anasoid.azurite.event.routes.Config;
 import org.apache.camel.builder.RouteBuilder;
 
 public class KafkaOut extends RouteBuilder {
