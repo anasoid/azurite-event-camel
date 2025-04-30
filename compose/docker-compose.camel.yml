@@ -18,12 +18,9 @@ services:
       ]
 
     environment:
-      SRC_FOLDER: /
       TARGET_NAME: BLOB_QUEUE
       KAFKA_BROKER: kafka:29092
       AZURITE_URL: "http://127.0.0.1:10000"
-      AZURITE_LOG_FOLDER: /logs
-      CAMEL_SEEK_FOLDER: /
       AMQP_URI: "amqp://servicebus:5672"
       BLOB_QUEUE_ENDPOINT: "http://azurite:10001"
 
