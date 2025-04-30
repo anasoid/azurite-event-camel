@@ -23,6 +23,7 @@ services:
       AZURITE_URL: "http://127.0.0.1:10000"
       AMQP_URI: "amqp://servicebus:5672"
       BLOB_QUEUE_ENDPOINT: "http://azurite:10001"
+      IGNORE_DELETE: "true"
 
     volumes:
       - ../src/main/java/org/anasoid/azurite/event/routes:/src
