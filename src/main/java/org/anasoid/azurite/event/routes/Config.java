@@ -9,6 +9,9 @@ public final class Config {
     public final static String FILE_PATH_SEEK = System.getenv().getOrDefault(CONF_CAMEL_SEEK_FOLDER, FILE_PATH);
     public final static String AZURITE_URL = System.getenv().getOrDefault(CONF_AZURITE_URL, "http://localhost:100000");
 
+    //CONFIG
+    public static final boolean IGNORE_CREATE = Boolean.valueOf(System.getenv().getOrDefault("IGNORE_CREATE", "false"));
+    public static final boolean IGNORE_DELETE = Boolean.valueOf(System.getenv().getOrDefault("IGNORE_DELETE", "false"));
     //AZURE
     private final static String CONF_AZURE_EVENT_FORMAT = "AZURE_EVENT_FORMAT";// grid or cloud
     public final static String AZURE_EVENT_FORMAT = System.getenv().getOrDefault(CONF_AZURE_EVENT_FORMAT, "grid");

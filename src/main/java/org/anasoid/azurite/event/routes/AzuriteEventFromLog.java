@@ -76,7 +76,9 @@ public class AzuriteEventFromLog extends RouteBuilder {
             EventData eventData = (EventData) exchange.getVariable(EVENT_DATA_KEY);
 
             if (eventData != null) {
-                if (("PUT".equals(eventData.getMethod()) || ("DELETE".equals(eventData.getMethod())))
+                if
+                ((("PUT".equals(eventData.getMethod()) && !Config.IGNORE_CREATE) ||
+                        ("DELETE".equals(eventData.getMethod()) && !Config.IGNORE_DELETE))
                         && (eventData.getStatus() < 210)) {
                     exchange.setVariable("skip_line", Boolean.valueOf(false).toString().toLowerCase());
                     String message = BodyFormater.formatBody(eventData, Config.AZURE_EVENT_FORMAT);
