@@ -1,34 +1,62 @@
 ---
 version: '3'
 services:
-  kafka:
+  azurite-local:
     extends:
-      file: docker-compose.kafka.yml
-      service: kafka
-    profiles: [kafka]
-  kafka-ui:
+      file: docker-compose.azurite.local.yml
+      service: azurite
+    profiles: [ local ]
+
+  azurite-init-local:
     extends:
-      file: docker-compose.kafka.yml
-      service: kafka-ui
-    profiles: [kafka]
+      file: docker-compose.azurite.yml
+      service: azurite-init
+    environment:
+      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;BlobEndpoint=http://azurite-local:10000/devstoreaccount1;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
+    profiles: [ local ]
     depends_on:
-      - kafka
+      azurite-local:
+        condition: service_healthy
 
   azurite:
     extends:
       file: docker-compose.azurite.yml
       service: azurite
+    profiles: [ docker ]
+
+  azurite-init:
+    extends:
+      file: docker-compose.azurite.yml
+      service: azurite-init
+    profiles: [ docker ]
+    depends_on:
+      azurite:
+        condition: service_healthy
 
   camel:
     extends:
       file: docker-compose.camel.yml
       service: camel
+    profiles: [ docker ]
+
+  kafka:
+    extends:
+      file: docker-compose.kafka.yml
+      service: kafka
+    profiles: [ kafka ]
+  kafka-ui:
+    extends:
+      file: docker-compose.kafka.yml
+      service: kafka-ui
+    profiles: [ kafka ]
+    depends_on:
+      - kafka
 
   servicebus:
     extends:
       file: servicebus/docker-compose.servicebus.yml
       service: servicebus
-    profiles: [servicebus]
+    profiles: [ servicebus ]
     depends_on:
       - sqledge
 
@@ -36,7 +64,7 @@ services:
     extends:
       file: servicebus/docker-compose.sqledge.yml
       service: sqledge
-    profiles: [servicebus]
+    profiles: [ servicebus ]
 
 networks:
   default:

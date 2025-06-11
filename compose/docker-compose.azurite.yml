@@ -10,11 +10,32 @@ services:
         "-c",
         "azurite -l /data --blobHost 0.0.0.0  --queueHost 0.0.0.0 --tableHost  0.0.0.0 | tee -a /logs/access-azurite.log",
       ]
+    healthcheck:
+      test: nc 127.0.0.1 10000 -z
+      interval: 1s
+      retries: 30
     ports:
       - "0.0.0.0:${AZURITE_PORT:-10000}:10000"
       - "0.0.0.0:${AZURITE_PORT:-10001}:10001"
     volumes:
       - azurite-logs:/logs
+
+
+  azurite-init:
+    image: mcr.microsoft.com/azure-cli:latest
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "Starting azurite-init"
+        az storage container create --name default
+        echo "End azurite-init"
+
+    depends_on:
+      azurite:
+        condition: service_healthy
+    environment:
+      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;BlobEndpoint=http://azurite:10000/devstoreaccount1;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
 
 volumes:
   azurite-logs:
