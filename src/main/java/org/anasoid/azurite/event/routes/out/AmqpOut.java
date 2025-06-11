@@ -1,7 +1,7 @@
 package org.anasoid.azurite.event.routes.out;
 
-// camel-k: dependency=camel-amqp
-// camel-k: dependency=org.apache.qpid:qpid-jms-client:2.5.0
+//DEPS camel-amqp
+//DEPS org.apache.qpid:qpid-jms-client:2.5.0
 
 import jakarta.jms.ConnectionFactory;
 import org.anasoid.azurite.event.routes.Config;
