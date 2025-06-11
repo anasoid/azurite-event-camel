@@ -4,19 +4,14 @@ services:
   azurite-local:
     extends:
       file: docker-compose.azurite.local.yml
-      service: azurite
+      service: azurite-local
     profiles: [ local ]
 
   azurite-init-local:
     extends:
-      file: docker-compose.azurite.yml
-      service: azurite-init
-    environment:
-      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;BlobEndpoint=http://azurite-local:10000/devstoreaccount1;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-    profiles: [ local ]
-    depends_on:
-      azurite-local:
-        condition: service_healthy
+      file: docker-compose.azurite.local.yml
+      service: azurite-init-local
+
 
   azurite:
     extends:
@@ -29,9 +24,6 @@ services:
       file: docker-compose.azurite.yml
       service: azurite-init
     profiles: [ docker ]
-    depends_on:
-      azurite:
-        condition: service_healthy
 
   camel:
     extends:

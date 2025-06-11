@@ -1,7 +1,7 @@
 ---
 version: "3.9"
 services:
-  azurite:
+  azurite-local:
     image: mcr.microsoft.com/azure-storage/azurite
     hostname: azurite
     command:
@@ -21,3 +21,18 @@ services:
       - .logs:/logs
 
 
+  azurite-init-local:
+    image: mcr.microsoft.com/azure-cli:latest
+    command:
+      - /bin/sh
+      - -c
+      - |
+        echo "Starting azurite-init"
+        az storage container create --name default
+        echo "End azurite-init"
+
+    depends_on:
+      azurite-local:
+        condition: service_healthy
+    environment:
+      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;BlobEndpoint=http://azurite-local:10000/devstoreaccount1;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
