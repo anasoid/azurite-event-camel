@@ -19,9 +19,9 @@ public final class Config {
     //TARGET
     private final static String CONF_TARGET_NAME = "TARGET_NAME";
     public final static String TARGET_NAME = System.getenv().getOrDefault(CONF_TARGET_NAME, "AMQP");
-    public final static Boolean IS_AMQP_TARGET = TARGET_NAME.equals("AMQP");
-    public final static Boolean IS_KAFKA_TARGET = TARGET_NAME.equals("KAFKA");
-    public final static Boolean IS_BLOB_QUEUE_TARGET = TARGET_NAME.equals("BLOB_QUEUE");
+    public final static Boolean IS_AMQP_TARGET = TARGET_NAME.equalsIgnoreCase("AMQP");
+    public final static Boolean IS_KAFKA_TARGET = TARGET_NAME.equalsIgnoreCase("KAFKA");
+    public final static Boolean IS_BLOB_QUEUE_TARGET = TARGET_NAME.equalsIgnoreCase("BLOB_QUEUE") || TARGET_NAME.equalsIgnoreCase("BLOBQUEUE") || TARGET_NAME.equalsIgnoreCase("BLOB");
 
 
     //BLOB_QUEUE

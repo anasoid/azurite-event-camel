@@ -1,4 +1,4 @@
-FROM jbangdev/jbang-action:0.125.1
+FROM jbangdev/jbang-action:0.126.1
 
 RUN jbang trust add https://github.com/apache/camel/
 

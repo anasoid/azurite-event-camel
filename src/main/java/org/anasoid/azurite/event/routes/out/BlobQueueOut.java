@@ -1,7 +1,7 @@
 package org.anasoid.azurite.event.routes.out;
 
-// camel-k: dependency=camel-azure-storage-queue
-// camel-k: dependency=com.azure:azure-storage-queue:12.24.1
+//DEPS camel-azure-storage-queue
+//DEPS com.azure:azure-storage-queue:12.24.1
 
 import com.azure.storage.common.StorageSharedKeyCredential;
 import com.azure.storage.queue.QueueServiceClient;

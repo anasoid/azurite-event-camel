@@ -3,7 +3,7 @@ version: "3.9"
 services:
   camel:
     build:
-      context: ./docker
+      context: ./camel
     command:
       [
         "run",
@@ -12,13 +12,11 @@ services:
         "/src/BodyFormater.java",
         "/src/AzuriteEventFromLog.java",
         "/src/BrokerSender.java",
-        "/src/out/AmqpOut.java",
-        "/src/out/KafkaOut.java",
-        "/src/out/BlobQueueOut.java"
+        "/src/out/${TARGET_NAME:-BlobQueue}Out.java"
       ]
 
     environment:
-      TARGET_NAME: BLOB_QUEUE
+      TARGET_NAME: ${TARGET_NAME:-BlobQueue}
       KAFKA_BROKER: kafka:29092
       AZURITE_URL: "http://127.0.0.1:10000"
       AMQP_URI: "amqp://servicebus:5672"

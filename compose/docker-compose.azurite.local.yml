@@ -1,7 +1,7 @@
 ---
 version: "3.9"
 services:
-  azurite:
+  azurite-local:
     image: mcr.microsoft.com/azure-storage/azurite
     hostname: azurite
     command:
@@ -18,10 +18,10 @@ services:
       - "0.0.0.0:${AZURITE_PORT:-10000}:10000"
       - "0.0.0.0:${AZURITE_PORT:-10001}:10001"
     volumes:
-      - azurite-logs:/logs
+      - .logs:/logs
 
 
-  azurite-init:
+  azurite-init-local:
     image: mcr.microsoft.com/azure-cli:latest
     command:
       - /bin/sh
@@ -32,10 +32,7 @@ services:
         echo "End azurite-init"
 
     depends_on:
-      azurite:
+      azurite-local:
         condition: service_healthy
     environment:
-      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;BlobEndpoint=http://azurite:10000/devstoreaccount1;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
-
-volumes:
-  azurite-logs:
+      AZURE_STORAGE_CONNECTION_STRING: "DefaultEndpointsProtocol=http;BlobEndpoint=http://azurite-local:10000/devstoreaccount1;AccountName=devstoreaccount1;AccountKey=Eby8vdM02xNOcqFlqUwJPLlmEtlCDXJ1OUzFT50uSRZ6IFsuFq2UVErCz4I6tq/K1SZFPTOtr/KBHBeksoGMGw==;"
